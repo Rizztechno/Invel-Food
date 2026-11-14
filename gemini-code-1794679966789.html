@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inval Food — Food Court & Jajanan Kaki Lima</title>
+  <!-- Google Fonts & Lucide Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Link ke file CSS eksternal -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ================= NAVBAR ================= -->
+  <header class="navbar">
+    <div class="container nav-inner">
+      <div class="brand" onclick="navigateTo('home')">
+        <div class="brand-logo">
+          <i data-lucide="utensils-crossed"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">Inval Food</span>
+          <span class="brand-tag">Street Food Court</span>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <button class="nav-btn-outline" onclick="navigateTo('home')">
+          <i data-lucide="store"></i>
+          <span>Jelajah Lapak</span>
+        </button>
+        <button class="nav-btn-cart" onclick="navigateTo('checkout')">
+          <i data-lucide="shopping-bag"></i>
+          <span>Keranjang</span>
+          <span class="badge" id="nav-cart-count">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= HALAMAN 1: BERANDA (FOOD COURT) ================= -->
+  <main id="page-home" class="page active">
+    <!-- Hero Banner Ala GoFood -->
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <span class="pill-badge">🔥 Pusat Kuliner Kaki Lima Terlengkap</span>
+          <h1>Lapar melanda? Jajan kaki lima di <span>Inval Food</span> aja!</h1>
+          <p>Pilih menu favorit dari berbagai lapak food court dalam sekali pesan. Praktis, murah meriah, dan langsung diproses lewat WhatsApp.</p>
+          
+          <div class="search-bar">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" id="search-input" placeholder="Cari nasi goreng, sate, martabak, es teh..." oninput="handleSearch()" />
+            <button class="btn-primary" onclick="handleSearch()">Cari</button>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80" alt="Kuliner Kaki Lima" />
+          <div class="floating-card">
+            <div class="fc-icon">⚡</div>
+            <div>
+              <strong>Pesan Banyak Lapak</strong>
+              <span>1x Checkout via WhatsApp</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filter Kategori -->
+    <section class="container section-block">
+      <div class="section-header">
+        <h2>Mau jajan apa hari ini?</h2>
+      </div>
+      <div class="category-list" id="category-list">
+        <!-- Diisi otomatis lewat script.js -->
+      </div>
+    </section>
+
+    <!-- Daftar Lapak / Tenant Food Court -->
+    <section class="container section-block">
+      <div class="section-header">
+        <div>
+          <h2>Daftar Lapak Food Court</h2>
+          <p class="subtitle">Klik lapak untuk melihat semua menu andalan mereka</p>
+        </div>
+      </div>
+      <div class="stall-grid" id="stall-grid">
+        <!-- Diisi otomatis lewat script.js -->
+      </div>
+    </section>
+
+    <!-- Semua Menu Kaki Lima Populer -->
+    <section class="container section-block">
+      <div class="section-header">
+        <div>
+          <h2 id="menu-section-title">Menu Kaki Lima Pilihan</h2>
+          <p class="subtitle">Bisa campur menu dari berbagai lapak sekaligus</p>
+        </div>
+      </div>
+      <div class="menu-grid" id="menu-grid">
+        <!-- Diisi otomatis lewat script.js -->
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= HALAMAN 2: DETAIL LAPAK ================= -->
+  <main id="page-stall" class="page">
+    <div class="container section-block">
+      <button class="back-btn" onclick="navigateTo('home')">
+        <i data-lucide="arrow-left"></i>
+        <span>Kembali ke Beranda</span>
+      </button>
+
+      <div class="stall-banner" id="stall-detail-header">
+        <!-- Diisi otomatis lewat script.js -->
+      </div>
+
+      <div class="section-header" style="margin-top: 28px;">
+        <h2>Daftar Menu di Lapak Ini</h2>
+      </div>
+      <div class="menu-grid" id="stall-menu-grid">
+        <!-- Diisi otomatis lewat script.js -->
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= HALAMAN 3: FORM PEMESANAN MANUAL & WA ================= -->
+  <main id="page-checkout" class="page">
+    <div class="container section-block">
+      <button class="back-btn" onclick="navigateTo('home')">
+        <i data-lucide="arrow-left"></i>
+        <span>Tambah Menu Lainnya</span>
+      </button>
+
+      <div class="checkout-layout">
+        <!-- Kolom Kiri: Keranjang & Form Manual -->
+        <div class="checkout-left">
+          <div class="card-box">
+            <div class="card-box-header">
+              <h2><i data-lucide="shopping-bag"></i> Ringkasan Pesanan Food Court</h2>
+              <button class="btn-text-danger" onclick="clearCart()">Kosongkan</button>
+            </div>
+            <div id="checkout-cart-list">
+              <!-- Item keranjang dirender lewat JS -->
+            </div>
+          </div>
+
+          <div class="card-box" style="margin-top: 20px;">
+            <div class="card-box-header">
+              <h2><i data-lucide="clipboard-edit"></i> Formulir Pemesanan Manual</h2>
+            </div>
+            <form id="manual-order-form" oninput="updateWhatsAppPreview()">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="cust-name">Nama Pemesan *</label>
+                  <input type="text" id="cust-name" placeholder="Contoh: Mas Kyo" required />
+                </div>
+                <div class="form-group">
+                  <label for="cust-phone">Nomor WhatsApp Pemesan *</label>
+                  <input type="tel" id="cust-phone" placeholder="Contoh: 081234567890" required />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Metode Layanan *</label>
+                <div class="radio-cards">
+                  <label class="radio-card">
+                    <input type="radio" name="service-type" value="Pesan Antar (Delivery)" checked onchange="toggleAddressField()" />
+                    <div class="rc-content">
+                      <strong>🛵 Pesan Antar (Delivery)</strong>
+                      <span>Diantar kurir Inval Food (+Ongkir Rp 5.000)</span>
+                    </div>
+                  </label>
+                  <label class="radio-card">
+                    <input type="radio" name="service-type" value="Ambil Sendiri (Pick-up)" onchange="toggleAddressField()" />
+                    <div class="rc-content">
+                      <strong>🛍️ Ambil Sendiri (Pick-up)</strong>
+                      <span>Ambil langsung di lokasi food court</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group" id="address-group">
+                <label for="cust-address">Alamat Lengkap / Patokan Pengantaran *</label>
+                <textarea id="cust-address" rows="2" placeholder="Masukkan nama jalan, nomor rumah, kos, atau patokan..."></textarea>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="payment-method">Metode Pembayaran</label>
+                  <select id="payment-method">
+                    <option value="Tunai / COD">Tunai / COD</option>
+                    <option value="QRIS">QRIS (Scan saat konfirmasi)</option>
+                    <option value="Transfer Bank">Transfer Bank</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="order-notes">Catatan Tambahan (Opsional)</label>
+                  <input type="text" id="order-notes" placeholder="Contoh: Pedas sedang, tanpa daun bawang" />
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Kolom Kanan: Rincian Biaya & Live Preview WA -->
+        <div class="checkout-right">
+          <div class="card-box sticky-box">
+            <h3>Rincian Pembayaran</h3>
+            <div class="bill-row">
+              <span>Subtotal Menu</span>
+              <span id="bill-subtotal">Rp 0</span>
+            </div>
+            <div class="bill-row">
+              <span>Ongkos Kirim</span>
+              <span id="bill-delivery">Rp 5.000</span>
+            </div>
+            <div class="bill-row total">
+              <span>Total Bayar</span>
+              <span id="bill-total">Rp 0</span>
+            </div>
+
+            <div class="wa-preview-box">
+              <div class="wa-preview-title">
+                <i data-lucide="message-square"></i> Preview Pesan WhatsApp
+              </div>
+              <pre id="wa-preview-text"></pre>
+            </div>
+
+            <button class="btn-wa-submit" onclick="sendOrderToWhatsApp()">
+              <i data-lucide="send"></i>
+              <span>Kirim Pesanan ke WhatsApp</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= FLOATING CART BAR ================= -->
+  <div class="floating-cart-bar" id="floating-cart-bar" onclick="navigateTo('checkout')">
+    <div class="fcb-left">
+      <span class="fcb-count" id="fcb-count">0 Item</span>
+      <span class="fcb-stalls" id="fcb-stalls">Dari 0 lapak</span>
+    </div>
+    <div class="fcb-right">
+      <strong id="fcb-total">Rp 0</strong>
+      <span class="fcb-cta">Pesan Manual <i data-lucide="chevron-right"></i></span>
+    </div>
+  </div>
+
+  <!-- Toast Notifikasi -->
+  <div id="toast" class="toast">Menu ditambahkan ke keranjang!</div>
+
+  <!-- Link ke file JavaScript eksternal -->
+  <script src="script.js"></script>
+</body>
+</html>
