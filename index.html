@@ -4,13 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Inval Food — Food Court & Jajanan Kaki Lima</title>
-  <!-- Google Fonts & Lucide Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Link ke file CSS eksternal -->
-  <link rel="stylesheet" href="assets/style.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
@@ -27,15 +25,49 @@
         </div>
       </div>
 
-      <div class="nav-actions">
-        <button class="nav-btn-outline" onclick="navigateTo('home')">
+      <!-- Menu Desktop -->
+      <nav class="nav-desktop">
+        <button class="nav-link" id="nav-link-home" onclick="navigateTo('home')">
           <i data-lucide="store"></i>
           <span>Jelajah Lapak</span>
+        </button>
+        <button class="nav-link" id="nav-link-owner" onclick="navigateTo('owner')">
+          <i data-lucide="user-check"></i>
+          <span>Owner</span>
         </button>
         <button class="nav-btn-cart" onclick="navigateTo('checkout')">
           <i data-lucide="shopping-bag"></i>
           <span>Keranjang</span>
           <span class="badge" id="nav-cart-count">0</span>
+        </button>
+      </nav>
+
+      <!-- Kontrol Mobile (Keranjang + Tombol Droplist) -->
+      <div class="nav-mobile-controls">
+        <button class="nav-btn-cart mobile-cart-btn" onclick="navigateTo('checkout')">
+          <i data-lucide="shopping-bag"></i>
+          <span class="badge" id="mobile-cart-count">0</span>
+        </button>
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle" onclick="toggleMobileDropdown()" aria-label="Buka Menu">
+          <i data-lucide="menu" id="mobile-menu-icon"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Droplist Menu Mobile -->
+    <div class="mobile-dropdown" id="mobile-dropdown">
+      <div class="container mobile-dropdown-inner">
+        <button class="dropdown-item" onclick="mobileNavAction('home')">
+          <i data-lucide="store"></i>
+          <span>Jelajah Lapak & Menu</span>
+        </button>
+        <button class="dropdown-item" onclick="mobileNavAction('owner')">
+          <i data-lucide="user-check"></i>
+          <span>Profil Owner & Tim</span>
+        </button>
+        <button class="dropdown-item" onclick="mobileNavAction('checkout')">
+          <i data-lucide="clipboard-edit"></i>
+          <span>Pemesanan Manual (Checkout WA)</span>
         </button>
       </div>
     </div>
@@ -43,7 +75,7 @@
 
   <!-- ================= HALAMAN 1: BERANDA (FOOD COURT) ================= -->
   <main id="page-home" class="page active">
-    <!-- Hero Banner Ala GoFood -->
+    <!-- Hero Banner -->
     <section class="hero">
       <div class="container hero-grid">
         <div class="hero-content">
@@ -51,13 +83,20 @@
           <h1>Lapar melanda? Jajan kaki lima di <span>Inval Food</span> aja!</h1>
           <p>Pilih menu favorit dari berbagai lapak food court dalam sekali pesan. Praktis, murah meriah, dan langsung diproses lewat WhatsApp.</p>
           
-          <div class="search-bar">
+          <form class="search-bar" onsubmit="handleSearch(event, true)">
             <i data-lucide="search" class="search-icon"></i>
-            <input type="text" id="search-input" placeholder="Cari nasi goreng, sate, martabak, es teh..." oninput="handleSearch()" />
-            <button class="btn-primary" onclick="handleSearch()">Cari</button>
-          </div>
+            <input 
+              type="text" 
+              id="search-input" 
+              placeholder="Cari nasi goreng, sate, martabak, es teh..." 
+              oninput="handleSearch(event, false)" 
+            />
+            <button type="button" class="clear-search-btn" id="clear-search-btn" onclick="resetSearch()" title="Hapus pencarian">✕</button>
+            <button type="submit" class="btn-primary">Cari</button>
+          </form>
         </div>
-        <div class="hero-visual">
+
+        <div class="hero-visual" onclick="scrollToSection('menu-section')" title="Klik untuk langsung lihat semua menu">
           <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80" alt="Kuliner Kaki Lima" />
           <div class="floating-card">
             <div class="fc-icon">⚡</div>
@@ -81,7 +120,7 @@
     </section>
 
     <!-- Daftar Lapak / Tenant Food Court -->
-    <section class="container section-block">
+    <section class="container section-block" id="stalls-section">
       <div class="section-header">
         <div>
           <h2>Daftar Lapak Food Court</h2>
@@ -94,12 +133,15 @@
     </section>
 
     <!-- Semua Menu Kaki Lima Populer -->
-    <section class="container section-block">
+    <section class="container section-block" id="menu-section">
       <div class="section-header">
         <div>
           <h2 id="menu-section-title">Menu Kaki Lima Pilihan</h2>
-          <p class="subtitle">Bisa campur menu dari berbagai lapak sekaligus</p>
+          <p class="subtitle" id="menu-section-subtitle">Bisa campur menu dari berbagai lapak sekaligus</p>
         </div>
+        <button class="btn-reset-filter" id="btn-reset-filter" onclick="resetAllFilters()" style="display: none;">
+          Tampilkan Semua
+        </button>
       </div>
       <div class="menu-grid" id="menu-grid">
         <!-- Diisi otomatis lewat script.js -->
@@ -115,20 +157,82 @@
         <span>Kembali ke Beranda</span>
       </button>
 
-      <div class="stall-banner" id="stall-detail-header">
-        <!-- Diisi otomatis lewat script.js -->
-      </div>
+      <div class="stall-banner" id="stall-detail-header"></div>
 
       <div class="section-header" style="margin-top: 28px;">
         <h2>Daftar Menu di Lapak Ini</h2>
       </div>
-      <div class="menu-grid" id="stall-menu-grid">
-        <!-- Diisi otomatis lewat script.js -->
+      <div class="menu-grid" id="stall-menu-grid"></div>
+    </div>
+  </main>
+
+  <!-- ================= HALAMAN 3: OWNER DI BALIK INVAL FOOD ================= -->
+  <main id="page-owner" class="page">
+    <div class="container section-block">
+      <button class="back-btn" onclick="navigateTo('home')">
+        <i data-lucide="arrow-left"></i>
+        <span>Kembali ke Beranda</span>
+      </button>
+
+      <div class="owner-hero-card">
+        <div class="owner-avatar-wrap">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" alt="Founder Inval Food" class="owner-avatar" />
+          <span class="owner-status-badge">Founder & Developer</span>
+        </div>
+        <div class="owner-bio">
+          <span class="pill-badge">👋 Kenalan Yuk!</span>
+          <h1>Di Balik Layar <span>Inval Food</span></h1>
+          <p class="owner-role">Founder, Creative Director & Web Developer — Inval Food Street Culinary</p>
+          <p class="owner-desc">
+            Inval Food lahir dari semangat mengangkat jajanan kaki lima lokal agar lebih mudah dijangkau lewat satu platform pemesanan terpadu. Tanpa aplikasi yang rumit—cukup pilih menu dari berbagai lapak favorit, isi formulir singkat, dan pesanan langsung terhubung ke WhatsApp kasir kami.
+          </p>
+          <div class="owner-stats">
+            <div class="stat-item">
+              <strong>6+</strong>
+              <span>Lapak Mitra</span>
+            </div>
+            <div class="stat-item">
+              <strong>100%</strong>
+              <span>UMKM Lokal</span>
+            </div>
+            <div class="stat-item">
+              <strong>Fast</strong>
+              <span>Respon via WA</span>
+            </div>
+          </div>
+          <div class="owner-actions">
+            <button class="btn-primary" onclick="contactOwnerWA()">
+              💬 Hubungi Owner via WhatsApp
+            </button>
+            <button class="nav-btn-outline" onclick="navigateTo('home')">
+              🍽️ Lihat Menu Food Court
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nilai & Visi Layanan -->
+      <div class="owner-values-grid">
+        <div class="value-card">
+          <div class="value-icon">🤝</div>
+          <h3>Dukung Pedagang Kaki Lima</h3>
+          <p>Membantu pelaku usaha kuliner gerobakan dan tenda agar memiliki katalog digital yang rapi dan modern.</p>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">⚡</div>
+          <h3>Tanpa Potongan Aplikasi Mahal</h3>
+          <p>Pemesanan langsung terhubung via WhatsApp sehingga harga makanan tetap ramah di kantong pembeli.</p>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">🍱</div>
+          <h3>Satu Keranjang Banyak Lapak</h3>
+          <p>Bebas gabungkan nasi goreng, sate, hingga minuman segar dalam satu kali pengiriman kurir.</p>
+        </div>
       </div>
     </div>
   </main>
 
-  <!-- ================= HALAMAN 3: FORM PEMESANAN MANUAL & WA ================= -->
+  <!-- ================= HALAMAN 4: FORM PEMESANAN MANUAL & WA ================= -->
   <main id="page-checkout" class="page">
     <div class="container section-block">
       <button class="back-btn" onclick="navigateTo('home')">
@@ -137,16 +241,14 @@
       </button>
 
       <div class="checkout-layout">
-        <!-- Kolom Kiri: Keranjang & Form Manual -->
+        <!-- Kolom Kiri -->
         <div class="checkout-left">
           <div class="card-box">
             <div class="card-box-header">
               <h2><i data-lucide="shopping-bag"></i> Ringkasan Pesanan Food Court</h2>
               <button class="btn-text-danger" onclick="clearCart()">Kosongkan</button>
             </div>
-            <div id="checkout-cart-list">
-              <!-- Item keranjang dirender lewat JS -->
-            </div>
+            <div id="checkout-cart-list"></div>
           </div>
 
           <div class="card-box" style="margin-top: 20px;">
@@ -208,7 +310,7 @@
           </div>
         </div>
 
-        <!-- Kolom Kanan: Rincian Biaya & Live Preview WA -->
+        <!-- Kolom Kanan -->
         <div class="checkout-right">
           <div class="card-box sticky-box">
             <h3>Rincian Pembayaran</h3>
@@ -242,6 +344,23 @@
     </div>
   </main>
 
+  <!-- ================= MODAL QUICK VIEW MENU (SAAT FOTO MENU DIKLIK) ================= -->
+  <div class="modal-backdrop" id="menu-modal" onclick="closeMenuModal(event)">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeMenuModal()">✕</button>
+      <img id="modal-menu-img" src="" alt="Preview Menu" />
+      <div class="modal-body">
+        <span class="menu-stall-tag" id="modal-menu-stall"></span>
+        <h3 id="modal-menu-title"></h3>
+        <p id="modal-menu-desc"></p>
+        <div class="modal-footer">
+          <strong id="modal-menu-price"></strong>
+          <button class="btn-primary" id="modal-add-btn">+ Tambah ke Keranjang</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= FLOATING CART BAR ================= -->
   <div class="floating-cart-bar" id="floating-cart-bar" onclick="navigateTo('checkout')">
     <div class="fcb-left">
@@ -257,7 +376,6 @@
   <!-- Toast Notifikasi -->
   <div id="toast" class="toast">Menu ditambahkan ke keranjang!</div>
 
-  <!-- Link ke file JavaScript eksternal -->
-  <script src="assets/script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
