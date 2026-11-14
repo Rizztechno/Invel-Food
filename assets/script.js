@@ -1,5 +1,5 @@
-// Nomor WhatsApp Admin / Kasir Pusat Inval Food (Format 628...)
-const ADMIN_WA_NUMBER = "6282228773853";
+// Nomor WhatsApp Admin / Owner Inval Food (Format 628...)
+const ADMIN_WA_NUMBER = "6281234567890";
 
 // Data Kategori
 const categories = [
@@ -174,22 +174,51 @@ const menus = [
 ];
 
 // State Aplikasi
-let cart = []; // [{ menuId, qty }]
+let cart = [];
 let activeCategory = "all";
 let currentStallId = null;
 
-// Format Rupiah
 function formatRupiah(num) {
   return "Rp " + num.toLocaleString("id-ID");
 }
 
-// Ambil Nama Lapak berdasarkan ID
 function getStallName(stallId) {
   const found = stalls.find(s => s.id === stallId);
   return found ? found.name : "Lapak Food Court";
 }
 
-// Render Kategori
+function scrollToSection(sectionId) {
+  const el = document.getElementById(sectionId);
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+// ================= DROPLIST MOBILE NAVBAR =================
+function toggleMobileDropdown() {
+  const dropdown = document.getElementById("mobile-dropdown");
+  const icon = document.getElementById("mobile-menu-icon");
+  const isOpen = dropdown.classList.toggle("open");
+  icon.setAttribute("data-lucide", isOpen ? "x" : "menu");
+  lucide.createIcons();
+}
+
+function closeMobileDropdown() {
+  const dropdown = document.getElementById("mobile-dropdown");
+  const icon = document.getElementById("mobile-menu-icon");
+  if (dropdown.classList.contains("open")) {
+    dropdown.classList.remove("open");
+    icon.setAttribute("data-lucide", "menu");
+    lucide.createIcons();
+  }
+}
+
+function mobileNavAction(pageName) {
+  closeMobileDropdown();
+  navigateTo(pageName);
+}
+
+// ================= KATEGORI & PENCARIAN =================
 function renderCategories() {
   const container = document.getElementById("category-list");
   container.innerHTML = categories.map(cat => `
@@ -204,9 +233,43 @@ function selectCategory(catId) {
   activeCategory = catId;
   renderCategories();
   renderMenus();
+  scrollToSection("menu-section");
 }
 
-// Render Daftar Lapak
+function handleSearch(event, shouldScroll = false) {
+  if (event && event.type === "submit") {
+    event.preventDefault();
+  }
+  const input = document.getElementById("search-input");
+  const clearBtn = document.getElementById("clear-search-btn");
+  if (input.value.trim().length > 0) {
+    clearBtn.classList.add("visible");
+  } else {
+    clearBtn.classList.remove("visible");
+  }
+
+  renderMenus();
+
+  if (shouldScroll) {
+    scrollToSection("menu-section");
+  }
+}
+
+function resetSearch() {
+  const input = document.getElementById("search-input");
+  input.value = "";
+  document.getElementById("clear-search-btn").classList.remove("visible");
+  renderMenus();
+}
+
+function resetAllFilters() {
+  activeCategory = "all";
+  resetSearch();
+  renderCategories();
+  renderMenus();
+}
+
+// ================= RENDER LAPAK & MENU =================
 function renderStalls() {
   const container = document.getElementById("stall-grid");
   container.innerHTML = stalls.map(stall => `
@@ -227,7 +290,6 @@ function renderStalls() {
   `).join("");
 }
 
-// Buat HTML Kartu Menu
 function createMenuCardHTML(item) {
   const inCart = cart.find(c => c.menuId === item.id);
   const actionHTML = inCart
@@ -240,9 +302,12 @@ function createMenuCardHTML(item) {
 
   return `
     <div class="menu-card">
-      <img src="${item.image}" alt="${item.name}" class="menu-img" />
+      <div class="menu-img-wrap" onclick="openMenuModal('${item.id}')" title="Klik untuk detail menu">
+        <img src="${item.image}" alt="${item.name}" class="menu-img" />
+        <span class="menu-zoom-hint">Lihat Detail</span>
+      </div>
       <div class="menu-body">
-        <div class="menu-stall-tag">🏪 ${getStallName(item.stallId)}</div>
+        <div class="menu-stall-tag" onclick="openStallDetail('${item.stallId}')">🏪 ${getStallName(item.stallId)}</div>
         <h3 class="menu-title">${item.name}</h3>
         <p class="menu-desc">${item.desc}</p>
         <div class="menu-footer">
@@ -254,9 +319,12 @@ function createMenuCardHTML(item) {
   `;
 }
 
-// Render Menu Beranda (Filter & Search)
 function renderMenus() {
   const keyword = document.getElementById("search-input").value.toLowerCase().trim();
+  const titleEl = document.getElementById("menu-section-title");
+  const subEl = document.getElementById("menu-section-subtitle");
+  const resetBtn = document.getElementById("btn-reset-filter");
+
   const filtered = menus.filter(item => {
     const matchCat = activeCategory === "all" || item.category === activeCategory;
     const matchSearch =
@@ -266,31 +334,73 @@ function renderMenus() {
     return matchCat && matchSearch;
   });
 
+  // Update judul sesuai filter aktif
+  const activeCatObj = categories.find(c => c.id === activeCategory);
+  if (keyword) {
+    titleEl.textContent = `Hasil pencarian "${keyword}" (${filtered.length})`;
+    subEl.textContent = "Menampilkan menu & lapak yang cocok";
+    resetBtn.style.display = "inline-block";
+  } else if (activeCategory !== "all") {
+    titleEl.textContent = `Kategori: ${activeCatObj.label} (${filtered.length})`;
+    subEl.textContent = "Klik foto menu untuk melihat detail porsi";
+    resetBtn.style.display = "inline-block";
+  } else {
+    titleEl.textContent = "Menu Kaki Lima Pilihan";
+    subEl.textContent = "Bisa campur menu dari berbagai lapak sekaligus";
+    resetBtn.style.display = "none";
+  }
+
   const grid = document.getElementById("menu-grid");
   if (filtered.length === 0) {
-    grid.innerHTML = `<p class="subtitle">Menu yang kamu cari belum tersedia.</p>`;
+    grid.innerHTML = `<p class="subtitle">Menu yang kamu cari belum tersedia. Coba kata kunci lain ya!</p>`;
     return;
   }
   grid.innerHTML = filtered.map(createMenuCardHTML).join("");
 }
 
-function handleSearch() {
-  renderMenus();
+// ================= MODAL QUICK VIEW FOTO MENU =================
+function openMenuModal(menuId) {
+  const item = menus.find(m => m.id === menuId);
+  if (!item) return;
+
+  document.getElementById("modal-menu-img").src = item.image;
+  document.getElementById("modal-menu-stall").textContent = "🏪 " + getStallName(item.stallId);
+  document.getElementById("modal-menu-title").textContent = item.name;
+  document.getElementById("modal-menu-desc").textContent = item.desc;
+  document.getElementById("modal-menu-price").textContent = formatRupiah(item.price);
+
+  const addBtn = document.getElementById("modal-add-btn");
+  addBtn.onclick = () => {
+    updateQty(item.id, 1);
+    closeMenuModal();
+  };
+
+  document.getElementById("menu-modal").classList.add("open");
 }
 
-// Navigasi Pindah Halaman (SPA)
+function closeMenuModal() {
+  document.getElementById("menu-modal").classList.remove("open");
+}
+
+// ================= NAVIGASI SPA =================
 function navigateTo(pageName) {
+  closeMobileDropdown();
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById(`page-${pageName}`).classList.add("active");
+
+  document.querySelectorAll(".nav-link").forEach(btn => btn.classList.remove("active-nav"));
+  const activeNavBtn = document.getElementById(`nav-link-${pageName}`);
+  if (activeNavBtn) activeNavBtn.classList.add("active-nav");
+
   window.scrollTo({ top: 0, behavior: "smooth" });
 
   if (pageName === "checkout") {
     renderCheckoutPage();
   }
+  updateCartSummary();
   lucide.createIcons();
 }
 
-// Buka Halaman Detail Lapak
 function openStallDetail(stallId) {
   currentStallId = stallId;
   const stall = stalls.find(s => s.id === stallId);
@@ -316,7 +426,12 @@ function renderStallMenus() {
   document.getElementById("stall-menu-grid").innerHTML = stallMenus.map(createMenuCardHTML).join("");
 }
 
-// Manajemen Keranjang
+function contactOwnerWA() {
+  const text = encodeURIComponent("Halo Owner Inval Food! Saya mau tanya-tanya seputar kemitraan lapak / pemesanan food court.");
+  window.open(`https://wa.me/${ADMIN_WA_NUMBER}?text=${text}`, "_blank");
+}
+
+// ================= MANAJEMEN KERANJANG & WA =================
 function updateQty(menuId, delta) {
   const index = cart.findIndex(c => c.menuId === menuId);
   if (index > -1) {
@@ -358,6 +473,7 @@ function updateCartSummary() {
   ).size;
 
   document.getElementById("nav-cart-count").textContent = totalQty;
+  document.getElementById("mobile-cart-count").textContent = totalQty;
   document.getElementById("fcb-count").textContent = `${totalQty} Item`;
   document.getElementById("fcb-stalls").textContent = `Dari ${uniqueStalls} lapak`;
   document.getElementById("fcb-total").textContent = formatRupiah(subtotal);
@@ -372,7 +488,6 @@ function updateCartSummary() {
   }
 }
 
-// Halaman Checkout & Pemesanan Manual
 function renderCheckoutPage() {
   const listEl = document.getElementById("checkout-cart-list");
   if (cart.length === 0) {
@@ -491,11 +606,11 @@ function showToast(msg) {
   setTimeout(() => toast.classList.remove("show"), 2000);
 }
 
-// Inisialisasi Awal
 document.addEventListener("DOMContentLoaded", () => {
   renderCategories();
   renderStalls();
   renderMenus();
   updateCartSummary();
+  document.getElementById("nav-link-home").classList.add("active-nav");
   lucide.createIcons();
 });
