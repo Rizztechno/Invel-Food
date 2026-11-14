@@ -1,5 +1,5 @@
 // Nomor WhatsApp Admin / Kasir Pusat Inval Food (Format 628...)
-const ADMIN_WA_NUMBER = "6281234567890";
+const ADMIN_WA_NUMBER = "6282228773853";
 
 // Data Kategori
 const categories = [
