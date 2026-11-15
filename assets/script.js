@@ -1,5 +1,5 @@
 // Nomor WhatsApp Admin / Owner Inval Food (Format 628...)
-const ADMIN_WA_NUMBER = "6281234567890";
+const ADMIN_WA_NUMBER = "6282228773853";
 
 // Data Kategori
 const categories = [
@@ -148,7 +148,7 @@ const menus = [
     id: "m9",
     stallId: "lapak-5",
     category: "bakso",
-    name: "Bakso Urat Komplit",
+    name: "Bakso Urat Komplit",invel
     price: 16000,
     desc: "Bakso urat sapi asli ukuran jumbo dengan mie kuning, bihun, tahu bakso, dan kuah kaldu gurih.",
     image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80"
@@ -427,7 +427,7 @@ function renderStallMenus() {
 }
 
 function contactOwnerWA() {
-  const text = encodeURIComponent("Halo Owner Inval Food! Saya mau tanya-tanya seputar kemitraan lapak / pemesanan food court.");
+  const text = encodeURIComponent("Halo Owner Gigu Food! Saya mau tanya-tanya seputar kemitraan lapak / pemesanan food court.");
   window.open(`https://wa.me/${ADMIN_WA_NUMBER}?text=${text}`, "_blank");
 }
 
@@ -549,7 +549,7 @@ function buildOrderMessage() {
         return `${i + 1}. [${getStallName(menu.stallId)}] ${menu.name} (${item.qty}x) = ${formatRupiah(menu.price * item.qty)}`;
       }).join("\n");
 
-  return `*PESANAN BARU - INVAL FOOD* 🍽️
+  return `*PESANAN BARU - GIGU FOOD* 🍽️
 --------------------------------
 *Data Pemesan:*
 • Nama: ${name}
