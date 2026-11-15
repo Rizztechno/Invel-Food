@@ -148,7 +148,7 @@ const menus = [
     id: "m9",
     stallId: "lapak-5",
     category: "bakso",
-    name: "Bakso Urat Komplit",invel
+    name: "Bakso Urat Komplit",
     price: 16000,
     desc: "Bakso urat sapi asli ukuran jumbo dengan mie kuning, bihun, tahu bakso, dan kuah kaldu gurih.",
     image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80"
